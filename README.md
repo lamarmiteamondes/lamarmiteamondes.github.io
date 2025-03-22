@@ -1,6 +1,6 @@
 # README
 
-Salut ! Bienvenue sur ce petit repo github qui va simplement servir à héberger des projets de prog exécutés par des membres du collectif. C'est globalement sans prétention.
+Salut ! Bienvenue sur ce petit repo github qui va simplement servir à héberger des projets de prog réalisés par des membres du collectif. C'est globalement sans prétention.
 
 ## Le Collectif
 
