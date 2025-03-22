@@ -33,9 +33,9 @@
             margin: 20px auto;
             background-color: var(--bg-colour);
             padding: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px var(--bg-colour);
             border-radius: 10px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 6px -1px var(--bg-colour);
         }
 
         .header {
@@ -289,13 +289,26 @@
             visibility: visible;
             border: 2px solid var(--highlight-colour)
         }
+
+        .soutien {
+            color: var(--text-colour);
+        }
+        .soutien a {
+            color: var(--highlight-colour);
+            text-decoration: underline;
+        }
+        .soutien a:hover {
+            color: var(--bg-colour-2);
+            transition: color 0.3s ease;
+
+        }
     </style>
 </head>
 
 <body>
 
 
-        <div class="container">
+    <div class="container">
         <h1 class="header">Découpeur (laser) de texte</h1>
         <div class="palette-selector">
             <div class="palette-title">Choisir une palette :</div>
@@ -340,6 +353,9 @@
         <div>
             <label for="outputBlocks" class="block">Résultat</label>
             <div id="outputBlocks" class="outputBlocks"></div>
+        </div>
+        <div>
+            <p class="soutien">Nous soutenir <a href="https://ko-fi.com/lamarmiteamondes">sur Ko-Fi</a></p>
         </div>
     </div>
     <script>
