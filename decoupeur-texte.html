@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Découpeur (laser) de texte</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Lato:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --text-colour: #F4F1ED;
+            --bg-colour: #000C0D;
+            --bg-colour-2: #4C878A;
+            --highlight-colour: #BE995B;
+            --highlight-colour-2: #9D7636;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--bg-colour);
+            margin: 0;
+            padding: 1.5rem;
+        }
+
+        div {
+            padding-top: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: var(--bg-colour);
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            font-family: 'Lora', serif;
+            font-weight: 700;
+            color: var(--highlight-colour);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-colour);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            width: 100%;
+            padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+            border: 1px solid var(--bg-colour-2);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            background-color: var(--bg-colour-2);
+            color: var(--text-colour);
+        }
+
+        input {
+            padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+            border: 1px solid var(--bg-colour-2);
+            border-radius: 5px;
+            margin-bottom: 35px;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            background-color: var(--bg-colour-2);
+            color: var(--text-colour);
+        }
+
+        button {
+            padding: 12px 25px;
+            border: 1px solid var(--highlight-colour);
+            border-radius: 10px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.1rem;
+            background-color: var(--highlight-colour);
+        }
+
+        #splitTextBtn {
+            background-color: var(--highlight-colour);
+            color: var(--text-colour);
+        }
+
+        #splitTextBtn:hover {
+            background-color: var(--bg-colour-2);
+            transition: background-color 0.3s ease;
+        }
+
+        #clearTextBtn {
+            background-color: var(--highlight-colour-2);
+            color: var(--text-colour);
+        }
+
+        #clearTextBtn:hover {
+            background-color: var(--bg-colour-2);
+            transition: background-color 0.3s ease;
+
+        }
+
+        .output-blocks {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--text-colour);
+            overflow-y: auto;
+            overflow-wrap: break-word;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+
+        .output-blocks-text {
+            flex-grow: 1; 
+            margin-right: 1rem; 
+        }
+
+        .copy-button {
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--highlight-colour);
+            border-radius: 5px;
+            font-family: 'Lato', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            background-color: var(--highlight-colour);
+            color: var(--bg-colour);
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background-color: var(--bg-colour-2);
+            color: var(--text-colour);
+        }
+
+        #outputBlocks {
+            background-color: var(--bg-colour-2);
+            border: 1px solid var(--highlight-colour);
+            padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+            margin-top: 10px;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            resize: vertical;
+            min-height: 320px;
+            border-radius: 5px;
+            color: var(--text-colour);
+        }
+
+        .non-selectable {
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .buttons > * + * {
+            margin-left: 1rem;
+        }
+
+        .palette-selector {
+            display: flex;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .palette-dropdown {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--bg-colour-2);
+            border-radius: 5px;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            background-color: var(--bg-colour-2);
+            color: var(--text-colour);
+            margin-left: 1rem;
+        }
+
+        .palette-dropdown:focus {
+            outline: none;
+            border-color: var(--highlight-colour);
+        }
+
+        .palette-title {
+            color: var(--text-colour);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .toggle-label {
+            margin-right: 10px;
+            color: var(--text-colour);
+            font-size: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--text-colour);
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--highlight-colour);
+        }
+
+        input:focus+.slider {
+            box-shadow: 0 0 1px var(--highlight-colour);
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        .tooltip {
+            position: relative;
+            display: block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 360px;
+            background-color: var(--bg-colour);
+            color: var(--text-colour);
+            text-align: center;
+            padding: 5px 0;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            border: 2px solid var(--highlight-colour)
+        }
+    </style>
+</head>
+
+<body>
+
+
+        <div class="container">
+        <h1 class="header">Découpeur (laser) de texte</h1>
+        <div class="palette-selector">
+            <div class="palette-title">Choisir une palette :</div>
+            <select id="palette-dropdown" class="palette-dropdown">
+                <option value="base">Base</option>
+                <option value="dark">Dark</option>
+                <option value="menthurquoise">Menthurquoise</option>
+                <option value="poussin_moche">Poussin moche</option>
+                <option value="achromatope">Daltonien</option>
+                <option value="achromatope_2">Daltonien 2 (texte blanc)</option>
+                <option value="sunset">Sunset</option>
+                <option value="forest">Forest</option>
+                <option value="ocean">Ocean</option>
+                <option value="purple">Purple</option>
+            </select>
+        </div>
+
+        <div class="">
+            <label for="inputText" class="block">Votre texte</label>
+            <textarea spellcheck="false" id="inputText" placeholder="Entrez votre texte ici." class="input-textarea"></textarea>
+        </div>
+
+        <div style="margin-right: 1rem;">
+            <label for="maxChars" class="block">Nombre maximum de caractères par bloc</label>
+            <input type="number" id="maxChars" value="300" class="maxCharsInput">
+        </div>
+        <div class="toggle-container tooltip">
+            <label class="toggle-label">Inclure le compteur</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggleCounter">
+                <span class="slider"></span>
+            </label>
+            <p class="tooltiptext">Si le bouton est activé, le compteur sera sélectionnable et vous pourrez le copier. S'il est désactivé, le compteur sera affiché, mais pas sélectionnable ni copiable. </p>
+        </div>
+
+        <div class="buttons">
+            <button id="splitTextBtn" class="splitTextBtn">Scinder le texte</button>
+            <button id="clearTextBtn" class="clearTextBtn">Effacer le texte</button>
+        </div>
+
+        
+        <div>
+            <label for="outputBlocks" class="block">Résultat</label>
+            <div id="outputBlocks" class="outputBlocks"></div>
+        </div>
+    </div>
+    <script>
+        const inputTextElement = document.getElementById("inputText");
+        const splitTextBtnElement = document.getElementById("splitTextBtn");
+        const clearTextBtnElement = document.getElementById("clearTextBtn");
+        const outputBlocksElement = document.getElementById("outputBlocks");
+        const maxCharsInputElement = document.getElementById("maxChars");
+        const paletteDropdown = document.getElementById("palette-dropdown");
+        const toggleCounterElement = document.getElementById("toggleCounter");
+
+
+        // définition des palettes
+        const palettes = {
+            base: {
+                "--text-colour": "#F4F1ED",
+                "--bg-colour": "#000C0D",
+                "--bg-colour-2": "#4C878A",
+                "--highlight-colour": "#BE995B",
+                "--highlight-colour-2": "#9D7636",
+            },
+            dark: {
+                "--text-colour": "#FFFFFF",
+                "--bg-colour": "#121212",
+                "--bg-colour-2": "#212121",
+                "--highlight-colour": "#BB86FC",
+                "--highlight-colour-2": "#81C784",
+            },
+            menthurquoise: {
+                "--text-colour": "#E0F2F1",
+                "--bg-colour": "#004D40",
+                "--bg-colour-2": "#26A69A",
+                "--highlight-colour": "#80CBC4",
+                "--highlight-colour-2": "#00897B",
+            },
+            poussin_moche: {
+                "--text-colour": "#212121",
+                "--bg-colour": "#FFF8E1",
+                "--bg-colour-2": "#FFD54F",
+                "--highlight-colour": "#FFC107",
+                "--highlight-colour-2": "#FF8F00",
+            },
+            light_blue: {
+                "--text-colour": "#000000",
+                "--bg-colour": "#E0F7FA",
+                "--bg-colour-2": "#B2EBF2",
+                "--highlight-colour": "#00BCD4",
+                "--highlight-colour-2": "#00869e",
+            },
+            pastel_green: {
+                "--text-colour": "#1a1a1a",
+                "--bg-colour": "#f0f4c3",
+                "--bg-colour-2": "#d4e157",
+                "--highlight-colour": "#aed581",
+                "--highlight-colour-2": "#7cb342",
+            },
+            achromatope: {
+                "--text-colour": "#000000",
+                "--bg-colour": "#FFFFFF",
+                "--bg-colour-2": "#fe6100",
+                "--highlight-colour": "#648fff",
+                "--highlight-colour-2": "#dc267f",
+            },
+            achromatope_2: {
+                "--text-colour": "#ffffff",
+                "--bg-colour": "#404040",
+                "--bg-colour-2": "#fe6100",
+                "--highlight-colour": "#648fff",
+                "--highlight-colour-2": "#dc267f",
+            },
+            sunset: {
+                "--text-colour": "#000000",
+                "--bg-colour": "#F3722C",
+                "--bg-colour-2": "#F8961E",
+                "--highlight-colour": "#F9C74F",
+                "--highlight-colour-2": "#90BE6D",
+            },
+            forest: {
+                "--text-colour": "#000000",
+                "--bg-colour": "#8FBC8F",
+                "--bg-colour-2": "#228B22",
+                "--highlight-colour": "#90EE90",
+                "--highlight-colour-2": "#006400",
+            },
+            ocean: {
+                "--text-colour": "#ffffff",
+                "--bg-colour": "#002FA4",
+                "--bg-colour-2": "#00416A",
+                "--highlight-colour": "#0080FF",
+                "--highlight-colour-2": "#4169E1",
+            },
+            purple: {
+                "--text-colour": "#F0F4C3",
+                "--bg-colour": "#301934",
+                "--bg-colour-2": "#6a1b9a",
+                "--highlight-colour": "#9c27b0",
+                "--highlight-colour-2": "#e91e63",
+            },
+        };
+
+        function applyPalette(paletteName) {
+            const palette = palettes[paletteName];
+            if (!palette) return;
+
+            for (const [variable, value] of Object.entries(palette)) {
+                document.documentElement.style.setProperty(variable, value);
+            }
+        }
+
+        // Appliquer la palette de base au chargement
+        applyPalette("base");
+
+        paletteDropdown.addEventListener("change", (event) => {
+            const paletteName = event.target.value;
+            applyPalette(paletteName);
+        });
+
+        
+        function splitText(text, blockSize = 300, maxTrailValue = minCharsNext) {
+            const blocks = [];
+            let remainingText = text.trim();
+            let currentBlockIndex = 1; 
+
+            while (remainingText.length > 0) {
+                const adjustedBlockSize = blockSize;
+
+                if (remainingText.length <= adjustedBlockSize) {
+                    blocks.push(remainingText);
+                    break;
+                }
+
+                let splitIndex = adjustedBlockSize;
+                let punctuationSplitIndex = -1;
+
+                // Trouver le signe de ponctuation le plus proche
+                for (let i = adjustedBlockSize; i >= 0; i--) {
+                    if (['.', ',', ';', ':', '!', '?'].includes(remainingText[i])) {
+                        punctuationSplitIndex = i + 1;
+                        break;
+                    }
+                }
+
+                if (punctuationSplitIndex !== -1) {
+                    splitIndex = punctuationSplitIndex;
+                } else {
+                    // Si y'a pas de ponctuation, on cherche une espace
+                    let spaceSplitIndex = -1;
+                    for (let i = adjustedBlockSize; i >= 0; i--) {
+                        if (remainingText[i] === ' ') {
+                            spaceSplitIndex = i;
+                            break;
+                        }
+                    }
+                    if (spaceSplitIndex !== -1) {
+                        splitIndex = spaceSplitIndex;
+                    }
+                }
+
+                let block = remainingText.substring(0, splitIndex).trim();
+                const nextText = remainingText.substring(splitIndex).trim();
+
+                // On s'occupe des bouts de phrases courts
+                if (nextText.length > 0 && nextText.length < maxTrailValue && blocks.length > 0) {
+                    if (blocks[blocks.length - 1].length + block.length <= adjustedBlockSize) {
+                        blocks[blocks.length - 1] += " " + block;
+                    } else {
+                        blocks.push(block);
+                    }
+                } else {
+                    blocks.push(block);
+                }
+
+                remainingText = nextText;
+                currentBlockIndex++; 
+            }
+            return blocks;
+        }
+
+        splitTextBtnElement.addEventListener("click", () => {
+            const text = inputTextElement.value.trim();
+            if (!text) {
+                outputBlocksElement.textContent = "Entrez votre texte à découper.";
+                return;
+            }
+
+            const maxChars = parseInt(maxCharsInputElement.value);
+            const minCharsNext = 20;
+            const displayCounter = toggleCounterElement.checked; 
+
+            const blocks = splitText(text, maxChars, minCharsNext);
+            const totalBlocks = blocks.length; 
+
+            outputBlocksElement.innerHTML = blocks.map((block, index) => {
+                const blockNumber = index + 1;
+                const counterString = displayCounter
+                    ? ` (${blockNumber}/${totalBlocks})`
+                    : ` <strong class="non-selectable">(${blockNumber}/${totalBlocks})</strong>`;
+                const blockText = `${block}${counterString}`;
+                return `<div class="output-blocks">
+                <div class="output-blocks-text">${blockText}</div>
+                <button class="copy-button" data-text="${block}">Copier</button>
+                </div>`
+            }).join("");
+
+            // event listener du bouton copier
+            const copyButtons = document.querySelectorAll('.copy-button');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const textToCopy = event.target.dataset.text;
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+            });
+        });
+
+        clearTextBtnElement.addEventListener("click", () => {
+            inputTextElement.value = "";
+            outputBlocksElement.innerHTML = "";
+        });
+    </script>
+</body>
+
+</html>
