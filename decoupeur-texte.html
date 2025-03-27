@@ -33,9 +33,9 @@
             margin: 20px auto;
             background-color: var(--bg-colour);
             padding: 30px;
-            box-shadow: 0 4px 8px var(--bg-colour);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            box-shadow: 0 4px 6px -1px var(--bg-colour);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
         }
 
         .header {
@@ -308,7 +308,7 @@
 <body>
 
 
-    <div class="container">
+        <div class="container">
         <h1 class="header">Découpeur (laser) de texte</h1>
         <div class="palette-selector">
             <div class="palette-title">Choisir une palette :</div>
@@ -354,9 +354,9 @@
             <label for="outputBlocks" class="block">Résultat</label>
             <div id="outputBlocks" class="outputBlocks"></div>
         </div>
-        <div>
-            <p class="soutien">Nous soutenir <a href="https://ko-fi.com/lamarmiteamondes">sur Ko-Fi</a></p>
-        </div>
+    </div>
+    <div>
+        <p class="soutien">Nous soutenir <a href="https://ko-fi.com/lamarmiteamondes">sur Ko-Fi</a></p>
     </div>
     <script>
         const inputTextElement = document.getElementById("inputText");
@@ -564,8 +564,13 @@
             const copyButtons = document.querySelectorAll('.copy-button');
             copyButtons.forEach(button => {
                 button.addEventListener('click', (event) => {
-                    const textToCopy = event.target.dataset.text;
+                    const clickedButton = event.target;
+                    const textElement = clickedButton.previousElementSibling;
+                    const textToCopy = textElement.textContent;
+
                     navigator.clipboard.writeText(textToCopy).then(() => {
+                        clickedButton.textContent = 'Copié!';
+                        setTimeout(() => { clickedButton.textContent = 'Copier'; }, 1500);
                     }).catch(err => {
                         console.error('Failed to copy: ', err);
                     });
